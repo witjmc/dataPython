@@ -109,3 +109,59 @@ unique_variables = extract_unique_variables(text)
 print("중복되지 않은 변수:")
 for variable in unique_variables:
     print(variable)
+
+
+#결과
+변수: ruleData, 값: {
+    severity
+변수: condition, 값: {
+      ruleInfo
+변수: commandCheck, 값: {
+          enabled
+변수: memo, 값: ''
+        }
+변수: fieldRelation, 값: {
+        op
+변수: code, 값: root
+변수: field, 값: [
+          logType
+변수: fields, 값: {
+        logType
+변수: default, 값: false
+변수: condition, 값: {
+            op
+변수: code, 값: root
+변수: field, 값: [
+              logType
+변수: allDiffOrSame, 값: 0
+변수: type, 값: toString
+        }
+변수: srcIpNat, 값: {
+          default
+변수: condition, 값: {
+            op
+변수: code, 값: root
+변수: field, 값: [
+              scripNat
+변수: allDiffOrSame, 값: 2
+변수: type, 값: toString
+        }
+변수: srcIp, 값: {
+          default
+변수: condition, 값: {
+            op
+변수: code, 값: root
+변수: field, 값: [
+              10.10.10.1
+변수: partition, 값: true
+변수: allDiffOrSame, 값: 1
+변수: type, 값: toIp
+        }
+
+중복되지 않은 변수:
+srcIp
+memo
+code
+enabled
+allDiffOrSame
+....생략
