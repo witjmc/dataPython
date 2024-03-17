@@ -10,10 +10,10 @@ def extract_variables_and_values(text):
 # 텍스트
 text = '''
 {
-  ruleData={
+  Data={
     severity=1,
     condition={
-      ruleInfo={
+      Info={
         commandCheck={
           enabled=true,
           memo=''
@@ -112,7 +112,7 @@ for variable in unique_variables:
 
 
 #결과
-변수: ruleData, 값: {
+변수: Data, 값: {
     severity
 변수: condition, 값: {
       ruleInfo
