@@ -62,7 +62,7 @@ model.compile(optimizer='adam',
 # 훈련 데이터를 사용하여 모델을 훈련하고, 주어진 에포크(epoch) 수 만큼 반복 
 model.fit(x_train, y_train, epochs=5)
 
-# 테스트 데이터로 모델 평가 (입력 이비미지들, 정답 레이블, 출력의 상세정도)
+# 테스트 데이터로 모델 평가 (입력 이미지들, 정답 레이블, 출력의 상세정도)
 test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
 print(f"Test accuracy: {test_acc}")
 
