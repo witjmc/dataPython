@@ -1,0 +1,140 @@
+# 1. pandas 라이브러리 (import pandas as pd) pandas 는 데이터 분석 및 조작을 위한 라이브러리로, 
+# 데이터프레임(DataFrame)과 시리즈(Series)를 사용하여 구조화된 데이터를 쉽게 다룰 수 있다.
+# 주요 함수 및 메서드 : pd.DataFrame(data) : 데이터프레임 생성 
+# df.head(n) : 상위 n 개 행 출력 df.info() : 데이터프레임의 정보 확인 
+# df.describe() : 통계 요약 정보 확인 df['column'].value_counts(): 특정 열의 값 개수 확인
+
+# 2. sklearn.model_selection.train_test_split 데이터를 학습용(train)과 테스트용(test) 으로 나누는 함수이다.
+# 주요 사용법 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2), random_state=42) 
+# x: 입력 데이터(특징) y: 정답(타겟) 데이터 
+# test_size=0.2 : 20% 를 테스트 데이터로 할당 
+# random_state=42 : 결과 재현성을 위한 랜덤 시드 설정
+
+# 3. sklearn.feature_extraction.text.TfidfVectorizer 텍스트 데이터를 숫자로 변환하는 데 사용한다. 
+# TF-IDF(단어 빈도-역문서 빈도)를 기반으로 각 단어의 중요도를 계산한다.
+# 주요 함수 및 메서드 : 
+# vectorizer = TfidfVectorizer() : 벡터라이저 객체 생성 
+# x_train_vec = vectorizer.fit_transform(X_train) : 학습 데이터 변환 및 벡터화 
+# x_test_vec = vectorizer.transform(X_test) : 테스트 데이터 변환 (학습된 정보를 사용)
+
+# 4. sklearn.linear_model.LogisticRegression 이진분류 또는 다중 클래스 분류를 수행하는 로지스틱 회귀 모델이다.
+# 주요 함수 및 메서드 : 
+# model = LogisticRegression() : 모델 객체 생성 
+# model.fix(X_train_vec, y_train) : 모델 학습 y_pred = model.predict(X_test_vec) : 예측 수행
+
+# 5. sklearn.metrics 모델의 성능을 평가하는 메트릭(metrics) 제공
+# 주요 함수 
+# accuracy_score(y_test, y_pred) : 정확도 계산 
+# classification_report(y_test, y_pred) : 정밀도, 재현율, F1-score 등 상세 성능 보고서 출력
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+
+
+# 샘플 데이터 (스팸 여부)
+data = {
+    'text': [
+        'Congratulations! You won a lottery. Claim your prize now.',
+        'Hello, how are you today?',
+        'You have been selected for a special offer.',
+        'Call me when you are free.',
+        'Win a brand new car! Click the link below.',
+        'Meeting is scheduled for tomorrow.',
+        'Get a free gift card now!',
+        'Let’s catch up this weekend.',
+        'Exclusive deal! Get 50% off now.',
+        'Urgent: Your account has been compromised. Reset now.',
+        'Reminder: Your appointment is at 3 PM.',
+        'Limited-time offer! Click here to claim.',
+        'Can you send me the report?',
+        'You are a lucky winner! Claim your free iPhone.',
+        'See you at the party tonight!',
+        'Your package is out for delivery.',
+        'Hurry! This deal expires soon.',
+        'Lunch at 12? Let me know!',
+        'Earn $500 from home! No experience needed.',
+        'Are you available for a quick call?'
+    ],
+    'label': [1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0]  # 1 = 스팸, 0 = 일반
+}
+
+
+# 1. 데이터프레임 생성
+df = pd.DataFrame(data)
+print(df)
+print('=================================================================')
+
+
+# 2. 데이터 분할 : 훈련(train), 테스트(test) 세트로 분리
+# df['text']: 입력 데이터(메시지 내용), df['label] : 정답 데이터(스팸 여부, 1=스팸, 0=일반) 
+# 전체 데이터의 20%를 테스트용, 80%를 훈련용 
+# 랜덤 시드를 고정하여 실행할 때마다 같은 결과를 얻을 수 있도록 설정
+#   X 는 독립 변수 (Features) 로 모델이 학습할 데이터로 보통 텍스트, 이미지, 수치 데이터 등을 포함
+# y는 종속 변수 (Labels) 로 모델이 예측하려고 하는 대상 변수로, 텍스트 분류 문제라면 각 텍스트에 대한 레이블(카테고리)이다. 
+
+X_train, X_test, y_train, y_test = train_test_split(df['text'], df['label'], test_size=0.2, random_state=42)
+
+# 3. 텍스트 벡터화
+# 텍스트 데이터는 머신러닝 모델이 이해할 수 없는 형태(문자열) -> 숫자로 변환 필요
+# TF-IDF 는 문장에서 중요한 단어를 찾는 방법 (단어의 출현 빈도tf와 희귀성idf 를 고려하여 문장을 벡터로 변환)
+
+vectorizer = TfidfVectorizer()
+
+# 4. 훈련 데이터 변환: 훈련 데이터에서 단어의 중요도를 학습(fit) 하고, 벡터로 변환
+# 즉, 훈련 데이터에서 단어 사전을 만들고, TF-IDF 점수를 계산하여 벡터로 변환
+
+X_train_vec = vectorizer.fit_transform(X_train)
+
+# 5. 테스트 데이터 변환 : 테스트 데이터는 훈련 데이터에서 학습한 단어 사전을 이용(기준)해 벡터 변환
+# 새로운 단어는 무시하고, 기존 단어에 대한 TF-IDF 점수만 계산 
+
+X_test_vec = vectorizer.transform(X_test)
+
+# 6. 로지스틱 회귀 모델 학습
+
+model = LogisticRegression(class_weight='balanced')
+
+# (입력 데이터, 정답 데이터)
+# 입력 데이터 : TF-IDF 벡터로 변환된 메시지 데이터 (문장의 숫자 벡터)
+# 정답 : 각 메시지가 스팸(1) 인지 아닌지(0) 라벨 정보 (스팸 여부)
+
+model.fit(X_train_vec, y_train)
+
+# 7. 예측 및 평가
+# 훈련된 모델이 x_test_vec(tf.idf 변환된 테스트 데이터) 을 입력으로 받아 각 메시지가 스펨(1)인지 일반(0) 인지 예측
+# 예측된 결과(0 또는 1) 가 y_pred 에 저장됨
+
+y_pred = model.predict(X_test_vec)
+
+# 정확도(Accuracy) = 맞게 예측한 개수 /전체 테스트 데이터 개수 
+print("Accuracy:", accuracy_score(y_test, y_pred))
+
+# 8. 모델의 세부 성능을 평가하는 보고서 출력(모델의 세부 성능)
+# precision(정밀도) : 스팸이라고 예측한 것 중 실제로 스팸인 비율 (TP / (TP + FP))
+# Recall (재현율) : 실제 스팸 중에서 모델이 스팸이라고 예측한 비율(TP / (TP+ FN))
+# F1-score : Precision과 Recall 의 조화 평균 (균형이 중요한 경우 사용)
+# Support : 해당 클래스에 속하는 실제 샘플 개수
+# Accuracy 정확도 : 전체 데이터 중 올바르게 분류한 비율  
+print("Classification Report:\n", classification_report(y_test, y_pred))
+
+print("=====================================================")
+
+# 9. 예측하려는 새로운 문장
+new_text = ["Congratulations! You've won a free iPhone."]
+
+# 10. 새로운 문장을 벡터화
+new_text_vect = vectorizer.transform(new_text)
+
+# 11. 예측하기
+predicted_label = model.predict(new_text_vect)
+print(predicted_label)  
+
+# 12. 예측 확률을 확인
+predicted_probs = model.predict_proba(new_text_vect)
+print("Predicted Probabilities (for both classes):", predicted_probs)
+
+# 13. 확률이 높다고 예측된 클래스를 출력
+predicted_class = model.predict(new_text_vect)
+print("Predicted Class:", predicted_class)
