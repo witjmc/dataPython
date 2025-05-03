@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>감정 일기(emotion diary)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 18px;
+            color: white;
+            border-radius: 30px;
+            background-color: #f44336; /* 기본적으로 부정적인 감정을 나타냄 */
+        }
+        .positive {
+            background-color: #4CAF50;
+            border-radius: 30px;
+        }
+        .neutral {
+            background-color: #FFEB3B;
+            border-radius: 30px;
+        }
+        .input-box {
+            width: 80%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+			      border: solid 2px #1E90FF;
+			      border-radius: 5px;
+            resize: both;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0b79d0;
+        }
+        .ad-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px;
+        }
+        .ad {
+        width: 30%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>emotion diary</h1>
+        <textarea id="userText" class="input-box" rows="6" placeholder="오늘의 감정 기록..."></textarea><br><br>
+        <button onclick="sendData()">분석하기</button>
+         <!-- 버튼 클릭 후 대시보드로 이동 -->
+         <button id="dashboardButton" style="display:none;" onclick="window.location.href='/dashboard'">대시보드 보기</button> <!-- 버튼 숨기기 -->
+
+        <div id="result" class="result"></div>
+        <!-- <div id="ad"></div> -->
+        <div class="ad-container">
+            <div id="left-ad" class="ad"></div>
+            <div id="center-ad" class="ad"></div>
+            <div id="right-ad" class="ad"></div>
+        </div>
+        <div class="ad-container">
+            <div id="left-ad2" class="ad"></div>
+            <div id="center-ad2" class="ad"></div>
+            <div id="right-ad2" class="ad"></div>
+        </div>
+    </div>
+
+    <script>
+        function sendData() {
+            const text = document.getElementById('userText').value;
+            const currentTime = new Date().toISOString(); // 현재 시간 ISO 포맷으로 저장
+            // 광고 클릭 수 추적용 객체
+            let adClicks = {
+                left: 0,
+                center: 0,
+                right: 0
+            };
+
+            fetch('/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    time: currentTime
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let resultDiv = document.getElementById('result');
+                //let adDiv = document.getElementById('ad');
+
+                // 감정 분석 결과에 따른 UI 변경
+                resultDiv.textContent = `감정 분석 결과: ${data.sentiment} (시간: ${data.time})`;
+                if (data.sentiment === "긍정적") {
+                    resultDiv.className = 'result positive';
+                } else if (data.sentiment === "중립적") {
+                    resultDiv.className = 'result neutral';
+                } else {
+                    resultDiv.className = 'result';
+                }
+
+                 // 광고 영역
+                const leftAdDiv = document.getElementById('left-ad');
+                const centerAdDiv = document.getElementById('center-ad');
+                const rightAdDiv = document.getElementById('right-ad');
+
+
+                // 광고 표시
+                if (data.sentiment === "부정적") {
+                    //adDiv.innerHTML = `<p>혹시 기분 전환을 원하시나요? <a href="https://example.com/ad" onclick="trackAdClick()">기분 전환 광고 보기</a></p>`;
+                     // 왼쪽 광고
+                    leftAdDiv.innerHTML = `<p>기분 전환을 원하시나요? <a href="https://example.com/ad1" onclick="trackAdClick('left')">기분 전환 광고 보기</a></p>`;
+
+                    // 중앙 광고 (예시로 다른 광고)
+                    centerAdDiv.innerHTML = `<p>스트레스를 줄여주는 방법 <a href="https://example.com/ad2" onclick="trackAdClick('center')">스트레스 해소 광고 보기</a></p>`;
+
+                    // 오른쪽 광고 (예시로 다른 광고)
+                    rightAdDiv.innerHTML = `<p>여행을 떠나고 싶나요? <a href="https://example.com/ad3" onclick="trackAdClick('right')">여행 광고 보기</a></p>`;
+
+                } else {
+                    //adDiv.innerHTML = ''; <-- 이렇게 하니깐, 긍정일때 보이지 않았음
+                    // 안전하게 처리: 정의된 경우에만
+                    if (typeof adDiv !== 'undefined') {
+                        adDiv.innerHTML = '';
+                    }
+                }
+
+
+                // 광고 위치 영역 가져오기
+                const leftAdDiv2 = document.getElementById('left-ad2');
+                const centerAdDiv2 = document.getElementById('center-ad2');
+                const rightAdDiv2 = document.getElementById('right-ad2');
+
+                // 모두 초기화
+                leftAdDiv2.innerHTML = '';
+                centerAdDiv2.innerHTML = '';
+                rightAdDiv2.innerHTML = '';
+
+                // 시간대에 따른 알림창 표시
+                if (data.time_of_day === "오전") {
+                    alert("좋은 아침입니다! 하루를 잘 시작하세요!");
+                    centerAdDiv2.innerHTML = `<p>상쾌한 하루를 시작하세요! <a href="https://example.com/morning" onclick="trackAdClick('center')">아침 광고 보기</a></p>`;
+                } else if (data.time_of_day === "오후") {
+                    alert("오후에도 힘내세요! 좋은 하루 되세요!");
+                    leftAdDiv2.innerHTML = `<p>스트레스를 풀어보세요! <a href="https://example.com/afternoon" onclick="trackAdClick('left')">스트레스 해소 광고 보기</a></p>`;
+                } else {
+                    alert("밤늦게까지 수고 많으셨어요! 편안한 밤 되세요.");
+                    rightAdDiv2.innerHTML = `<p>편안한 밤 되세요! <a href="https://example.com/night" onclick="trackAdClick('right')">숙면 광고 보기</a></p>`;
+                }
+
+                // 대시보드 보기 버튼 표시
+                document.getElementById('dashboardButton').style.display = 'inline-block'; // 버튼을 보이게 합니다
+            });
+        }
+
+        function trackAdClick(position) {
+            fetch('/ad-click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ position: position, time: new Date().toISOString() })
+            });
+        }
+
+
+    </script>
+</body>
+</html>
