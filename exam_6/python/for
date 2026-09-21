@@ -1,1 +1,21 @@
+# 아래로 출력
+for i in range(2, 10) :
+    print('\n**', i,'단**')
+ 
+    for k in range(1, 10) :
+        print(i, "x", k, "=", (i*k))
+        
+# 옆으로 출력
+for i in range(2,10) :
+    print('**', i , '단**', end = '\t')
+ 
+for i in range(1, 10):
+    print()
+    for k in range(2, 10) :
+        print( k, "x", i, "=", (k * i), end="\t")
 
+#거꾸로 출력
+for num in range(9, 0, -1) :
+    for dan in range( 9, 1, -1) :
+        print("{0:1d}x{1:1d}={2:2d}".format(dan, num, dan*num), end =' ')
+    print()
