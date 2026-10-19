@@ -46,6 +46,6 @@ for i in range(len(image1)-1) :
             image1[k], image1[k+1] = image1[k+1], image1[k]
 print(image1)
 
-
+작성일: 2022.08.01 깃작성:2026.10.19
 
 
