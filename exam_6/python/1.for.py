@@ -21,4 +21,6 @@ for num in range(9, 0, -1) :
         print("{0:1d}x{1:1d}={2:2d}".format(dan, num, dan*num), end =' ')
     print()
 
+
 # 작성일 : 2022.08.01
+# 깃작성 : 2026.10.19
