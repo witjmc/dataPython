@@ -21,5 +21,5 @@ dataPython ReadMe
 
 06. 파이썬 기초 문법 정리 (폴더명: exam_6)
 
-07. Edge MLOps - yolo 모델로 사람 감지 프로젝트
+07. yolo 모델로 사람 감지 프로젝트
     (폴더명 : exam_7) 
